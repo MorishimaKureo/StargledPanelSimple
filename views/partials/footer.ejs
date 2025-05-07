@@ -7,24 +7,25 @@ document.addEventListener('DOMContentLoaded', function() {
     var sidebar = document.getElementById('sidebar');
     var toggle = document.getElementById('sidebar-toggle');
     var overlay = document.getElementById('sidebar-overlay');
-    // Ensure sidebar is closed on mobile at load
-    if (window.innerWidth <= 900) {
-        sidebar.classList.add('closed');
-    } else {
-        sidebar.classList.remove('closed');
-    }
+
     function openSidebar() {
         sidebar.classList.add('open');
         sidebar.classList.remove('closed');
+        toggle.classList.add('top-right'); // Add class to move button to top right
+        toggle.innerHTML = '&times;'; // Change icon to cross
         document.body.classList.add('sidebar-open');
         overlay.style.display = 'block';
     }
+
     function closeSidebar() {
         sidebar.classList.remove('open');
         sidebar.classList.add('closed');
+        toggle.classList.remove('top-right'); // Remove class to move button to bottom
+        toggle.innerHTML = '&#9776;'; // Change icon back to hamburger
         document.body.classList.remove('sidebar-open');
         overlay.style.display = 'none';
     }
+
     if (toggle) {
         toggle.onclick = function() {
             if (sidebar.classList.contains('open')) {
@@ -34,19 +35,9 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         };
     }
+
     if (overlay) {
         overlay.onclick = closeSidebar;
     }
-    // Optional: close sidebar on resize if desktop, open if desktop
-    window.addEventListener('resize', function() {
-        if (window.innerWidth > 900) {
-            sidebar.classList.remove('closed');
-            sidebar.classList.remove('open');
-            overlay.style.display = 'none';
-            document.body.classList.remove('sidebar-open');
-        } else {
-            sidebar.classList.add('closed');
-        }
-    });
 });
 </script>

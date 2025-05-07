@@ -53,7 +53,7 @@
 #sidebar-toggle {
     display: none;
     position: fixed;
-    top: 16px;
+    bottom: 16px; /* Default position at the bottom */
     left: 16px;
     z-index: 300;
     background: #222;
@@ -63,9 +63,21 @@
     padding: 6px 12px;
     border-radius: 4px;
     cursor: pointer;
+    transition: top 0.3s ease, bottom 0.3s ease, right 0.3s ease; /* Smooth transition */
 }
 
+#sidebar-toggle.top-right {
+    top: 16px; /* Move to the top */
+    right: 16px; /* Position at the right */
+    left: auto; /* Reset left position */
+    bottom: auto; /* Reset bottom position */
+}
+
+/* Ensure the toggle button is visible on mobile */
 @media (max-width: 900px) {
+    #sidebar-toggle {
+        display: block;
+    }
     #sidebar {
         transform: translateX(-100%);
     }
