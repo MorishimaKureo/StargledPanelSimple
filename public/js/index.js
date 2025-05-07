@@ -57,3 +57,10 @@ function sendCommand() {
     socket.emit('send-command', cmd);
     document.getElementById('command-input').value = '';
 }
+
+// Add event listener for Enter key on command input
+document.getElementById('command-input').addEventListener('keydown', function(event) {
+    if (event.key === 'Enter') {
+        sendCommand();
+    }
+});
