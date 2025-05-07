@@ -217,6 +217,7 @@ app.post('/settings', express.json(), (req, res) => {
 
 io.on('connection', (socket) => {
     console.log('A user connected');
+    
     // Send existing logs from Minecraft server
     try {
         const logs = fs.existsSync(logFilePath) ? 
@@ -229,12 +230,11 @@ io.on('connection', (socket) => {
     }
 });
 
+    // Place socket event handlers inside this block
     socket.on('start-server', () => {
         if (!mcProcess) {
-            // Use custom or default startup script
             const settings = getSettings();
             const script = settings.startupScript || 'java -Xmx1024M -Xms1024M -jar server.jar nogui';
-            // Split script into command and args
             const [cmd, ...args] = script.split(' ');
             mcProcess = spawn(cmd, args, {
                 cwd: path.join(__dirname, 'server')
