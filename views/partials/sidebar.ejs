@@ -1,6 +1,8 @@
 <link rel="stylesheet" href="/css/sidebar.css">
+<button id="sidebar-toggle">&#9776;</button>
 <div id="sidebar">
     <a href="/" class="<%= page === 'console' ? 'active' : '' %>">Console</a>
     <a href="/filemanager" class="<%= page === 'filemanager' ? 'active' : '' %>">File Manager</a>
     <a href="/settings" class="<%= page === 'settings' ? 'active' : '' %>">Settings</a>
 </div>
+<div id="sidebar-overlay"></div>

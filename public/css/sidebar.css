@@ -9,7 +9,14 @@
     flex-direction: column;
     align-items: stretch;
     padding-top: 30px;
+    z-index: 200;
+    transition: transform 0.3s ease;
 }
+
+#sidebar.closed {
+    transform: translateX(-100%);
+}
+
 #sidebar a {
     background: none;
     border: none;
@@ -22,6 +29,63 @@
     transition: background 0.2s;
     display: block;
 }
+
 #sidebar a.active, #sidebar a:hover {
     background: #444;
+}
+
+/* Overlay for mobile when sidebar is open */
+#sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.3);
+    z-index: 150;
+}
+
+#sidebar.open + #sidebar-overlay {
+    display: block;
+}
+
+/* Hamburger button */
+#sidebar-toggle {
+    display: none;
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    z-index: 300;
+    background: #222;
+    color: #fff;
+    border: none;
+    font-size: 28px;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+@media (max-width: 900px) {
+    #sidebar {
+        transform: translateX(-100%);
+    }
+    #sidebar.open {
+        transform: translateX(0);
+    }
+    #sidebar.closed {
+        transform: translateX(-100%);
+    }
+    #sidebar-toggle {
+        display: block;
+    }
+    #main-content {
+        margin-left: 0 !important;
+    }
+    body.sidebar-open {
+        overflow: hidden;
+    }
+    #sidebar a {
+        padding: 4px 8px; /* Even smaller padding for less space */
+        font-size: 14px;  /* Slightly smaller font if desired */
+    }
 }

@@ -5,3 +5,11 @@ footer {
     margin-left: 180px;
     text-align: center;
 }
+
+/* Responsive: remove margin on mobile */
+@media (max-width: 900px) {
+    footer {
+        margin-left: 0;
+        padding: 10px 16px;
+    }
+}

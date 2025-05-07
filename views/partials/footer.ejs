@@ -2,3 +2,51 @@
 <footer>
     &copy; <%= new Date().getFullYear() %> Stargled Panel
 </footer>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var sidebar = document.getElementById('sidebar');
+    var toggle = document.getElementById('sidebar-toggle');
+    var overlay = document.getElementById('sidebar-overlay');
+    // Ensure sidebar is closed on mobile at load
+    if (window.innerWidth <= 900) {
+        sidebar.classList.add('closed');
+    } else {
+        sidebar.classList.remove('closed');
+    }
+    function openSidebar() {
+        sidebar.classList.add('open');
+        sidebar.classList.remove('closed');
+        document.body.classList.add('sidebar-open');
+        overlay.style.display = 'block';
+    }
+    function closeSidebar() {
+        sidebar.classList.remove('open');
+        sidebar.classList.add('closed');
+        document.body.classList.remove('sidebar-open');
+        overlay.style.display = 'none';
+    }
+    if (toggle) {
+        toggle.onclick = function() {
+            if (sidebar.classList.contains('open')) {
+                closeSidebar();
+            } else {
+                openSidebar();
+            }
+        };
+    }
+    if (overlay) {
+        overlay.onclick = closeSidebar;
+    }
+    // Optional: close sidebar on resize if desktop, open if desktop
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 900) {
+            sidebar.classList.remove('closed');
+            sidebar.classList.remove('open');
+            overlay.style.display = 'none';
+            document.body.classList.remove('sidebar-open');
+        } else {
+            sidebar.classList.add('closed');
+        }
+    });
+});
+</script>
