@@ -4,6 +4,7 @@ const socketIo = require('socket.io');
 const { spawn } = require('child_process');
 const path = require('path');
 const fs = require('fs');
+const os = require('os');
 const multer = require('multer');
 const upload = multer({ dest: path.join(__dirname, 'server') });
 
@@ -19,6 +20,33 @@ app.set('views', path.join(__dirname, 'views'));
 
 // Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Function to calculate folder size
+function getFolderSize(folderPath) {
+    const files = fs.readdirSync(folderPath);
+    let totalSize = 0;
+    files.forEach(file => {
+        const filePath = path.join(folderPath, file);
+        const stats = fs.statSync(filePath);
+        totalSize += stats.isDirectory() ? getFolderSize(filePath) : stats.size;
+    });
+    return totalSize;
+}
+
+// Emit system stats periodically
+setInterval(() => {
+    if (mcProcess) {
+        const cpuUsage = os.loadavg()[0] / os.cpus().length * 100; // CPU usage as percentage
+        const ramUsage = process.memoryUsage().rss / (1024 * 1024); // RAM usage in MB
+        const serverFolderSize = getFolderSize(path.join(__dirname, 'server')) / (1024 * 1024 * 1024); // Folder size in GB
+
+        io.emit('system-stats', {
+            cpuUsage,
+            ramUsage,
+            serverFolderSize
+        });
+    }
+}, 5000); // Emit every 5 seconds
 
 // Render the main page
 app.get('/', (req, res) => {

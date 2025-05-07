@@ -4,13 +4,14 @@
     <title>Minecraft Server Panel</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="/css/global.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <%- include('partials/sidebar', { page: page }) %>
     <%- include('partials/header') %>
     <div id="main-content">
+        <h1>Minecraft Server Control Panel</h1>
         <div id="console-section">
-            <h1>Minecraft Server Control Panel</h1>
             <button onclick="startServer()">Start Server</button>
             <button onclick="stopServer()">Stop Server</button>
             <button onclick="clearLog()">Clear Log</button>
@@ -21,71 +22,14 @@
             <input id="command-input" type="text" placeholder="Type command..." />
             <button onclick="sendCommand()">Send</button>
         </div>
+        <div id="system-stats">
+            <canvas id="cpu-usage-chart" width="400" height="200"></canvas>
+            <div id="cpu-usage"></div>
+            <div id="ram-usage"></div>
+            <div id="server-folder-size"></div>
+        </div>
     </div>
     <%- include('partials/footer') %>
-    <script src="/socket.io/socket.io.js"></script>
-    <script>
-        const socket = io();
-
-        // Sidebar navigation
-        function showSection(section) {
-            document.getElementById('console-section').classList.add('hidden');
-            document.getElementById('filemanager-section').classList.add('hidden');
-            document.getElementById('console-tab').classList.remove('active');
-            document.getElementById('filemanager-tab').classList.remove('active');
-            if (section === 'console') {
-                document.getElementById('console-section').classList.remove('hidden');
-                document.getElementById('console-tab').classList.add('active');
-            } else {
-                document.getElementById('filemanager-section').classList.remove('hidden');
-                document.getElementById('filemanager-tab').classList.add('active');
-                fetchFiles();
-            }
-        }
-
-        // Console output
-        const consoleOutput = document.getElementById('console-output');
-        socket.on('server-output', msg => {
-            consoleOutput.textContent += msg + '\n';
-            consoleOutput.scrollTop = consoleOutput.scrollHeight;
-        });
-
-        function startServer() { socket.emit('start-server'); }
-        function stopServer() { socket.emit('stop-server'); }
-        function sendCommand() {
-            const cmd = document.getElementById('command-input').value;
-            socket.emit('send-command', cmd);
-            document.getElementById('command-input').value = '';
-        }
-
-        function clearLog() {
-            consoleOutput.textContent = '';
-        }
-
-        // File manager
-        function fetchFiles() {
-            fetch('/files')
-                .then(res => res.json())
-                .then(files => {
-                    const list = document.getElementById('file-list');
-                    list.innerHTML = '';
-                    if (files.length === 0) {
-                        list.textContent = 'No files found.';
-                    } else {
-                        files.forEach(file => {
-                            const div = document.createElement('div');
-                            div.className = 'file-item';
-                            div.textContent = file;
-                            list.appendChild(div);
-                        });
-                    }
-                });
-        }
-        document.getElementById('kill-btn').onclick = function() {
-            if (confirm('Are you sure you want to force kill the server process?')) {
-                socket.emit('kill-server');
-            }
-        };
-    </script>
+    <script src="/js/index.js"></script>
 </body>
 </html>
