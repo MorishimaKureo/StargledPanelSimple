@@ -29,6 +29,13 @@ socket.on('system-stats', ({ cpuUsage, ramUsage, serverFolderSize }) => {
     });
 });
 
+// Listen for server output
+socket.on('server-output', (msg) => {
+    const consoleOutput = document.getElementById('console-output');
+    consoleOutput.textContent += msg + '\n';
+    consoleOutput.scrollTop = consoleOutput.scrollHeight;
+});
+
 function startServer() {
     socket.emit('start-server');
     console.log('Server start command sent');
