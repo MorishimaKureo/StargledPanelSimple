@@ -11,7 +11,7 @@ const upload = multer({ dest: path.join(__dirname, 'server') });
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
-const logFilePath = path.join(__dirname, 'logs', 'console.log');
+const logFilePath = path.join(__dirname, 'server', 'logs', 'latest.log');
 
 if (!fs.existsSync(path.dirname(logFilePath))) {
     fs.mkdirSync(path.dirname(logFilePath), { recursive: true });
@@ -216,13 +216,18 @@ app.post('/settings', express.json(), (req, res) => {
 });
 
 io.on('connection', (socket) => {
-    // Emit stored logs to the client
-    socket.emit('stored-logs', fs.existsSync(logFilePath) ? fs.readFileSync(logFilePath, 'utf8') : '');
-
-    socket.on('server-output', (msg) => {
-        appendLog(msg);
-        io.emit('server-output', msg);
-    });
+    console.log('A user connected');
+    // Send existing logs from Minecraft server
+    try {
+        const logs = fs.existsSync(logFilePath) ? 
+            fs.readFileSync(logFilePath, 'utf8') : 
+            'No server logs found';
+        socket.emit('stored-logs', logs);
+    } catch (e) {
+        console.error('Error reading logs:', e);
+        socket.emit('stored-logs', 'Error loading server logs');
+    }
+});
 
     socket.on('start-server', () => {
         if (!mcProcess) {
@@ -277,7 +282,6 @@ io.on('connection', (socket) => {
             console.log('Server process killed');
         }
     });
-});
 
 // Get file content for editing
 app.get('/edit', (req, res) => {
