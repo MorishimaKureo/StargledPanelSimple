@@ -24,7 +24,15 @@
             <button onclick="sendCommand()">Send</button>
         </div>
         <div id="system-stats">
-            <canvas id="cpu-usage-chart" width="400" height="200"></canvas>
+            <div class="chart-container">
+                <canvas id="cpu-usage-chart" width="200" height="100"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="ram-usage-chart" width="200" height="100"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="server-folder-size-chart" width="200" height="100"></canvas>
+            </div>
             <div id="cpu-usage"></div>
             <div id="ram-usage"></div>
             <div id="server-folder-size"></div>
