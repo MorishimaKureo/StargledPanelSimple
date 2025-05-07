@@ -35,7 +35,7 @@ StargledPanelSimple is a web-based server management panel designed to facilitat
 
 1. **Start the server**:
    ```bash
-   node server.js
+   node .
    ```
 
 2. **Access the application**:
