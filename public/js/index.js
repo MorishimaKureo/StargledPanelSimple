@@ -29,6 +29,22 @@ socket.on('system-stats', ({ cpuUsage, ramUsage, serverFolderSize }) => {
     });
 });
 
+function startServer() {
+    socket.emit('start-server');
+    console.log('Server start command sent');
+}
+
+function stopServer() {
+    socket.emit('stop-server');
+    console.log('Server stop command sent');
+}
+
+function clearLog() {
+    const consoleOutput = document.getElementById('console-output');
+    consoleOutput.textContent = '';
+    console.log('Console log cleared');
+}
+
 function sendCommand() {
     const cmd = document.getElementById('command-input').value;
     socket.emit('send-command', cmd);
