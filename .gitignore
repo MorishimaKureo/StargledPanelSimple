@@ -137,9 +137,25 @@ dist
 
 # server
 server/cache
+server/config
 server/libraries
 server/logs
 server/plugins
 server/versions
+server/world
+server/world_nether
+server/world_the_end
+server/banned-ips.json
+server/banned-players.json
+server/bukkit.yml
+server/commands.yml
 server/eula.txt
+server/help.yml
+server/ops.json
+server/permissions.yml
+server/purpur.yml
 server/server.properties
+server/spigot.yml
+server/usercache.json
+server/version_history.json
+server/whitelist.json
