@@ -282,6 +282,7 @@ io.on('connection', (socket) => {
             console.log('Server process killed');
         }
     });
+});
 
 // Get file content for editing
 app.get('/edit', (req, res) => {
