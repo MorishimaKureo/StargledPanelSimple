@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="/css/global.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
     <%- include('partials/sidebar', { page: page }) %>
@@ -30,6 +31,7 @@
         </div>
     </div>
     <%- include('partials/footer') %>
+    <!-- Include your custom JavaScript file -->
     <script src="/js/index.js"></script>
 </body>
 </html>
