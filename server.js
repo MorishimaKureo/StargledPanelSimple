@@ -7,12 +7,8 @@ const fs = require('fs');
 const os = require('os');
 const multer = require('multer');
 const upload = multer({ dest: path.join(__dirname, 'server') });
-
-const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
-const fs = require('fs');
-const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
