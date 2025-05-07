@@ -8,9 +8,24 @@ const os = require('os');
 const multer = require('multer');
 const upload = multer({ dest: path.join(__dirname, 'server') });
 
+const express = require('express');
+const http = require('http');
+const socketIo = require('socket.io');
+const fs = require('fs');
+const path = require('path');
+
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
+const logFilePath = path.join(__dirname, 'logs', 'console.log');
+
+if (!fs.existsSync(path.dirname(logFilePath))) {
+    fs.mkdirSync(path.dirname(logFilePath), { recursive: true });
+}
+
+function appendLog(message) {
+    fs.appendFileSync(logFilePath, message + '\n');
+}
 
 let mcProcess = null;
 
@@ -51,6 +66,14 @@ setInterval(() => {
 // Render the main page
 app.get('/', (req, res) => {
     res.render('index', { page: 'console' });
+});
+
+app.get('/logs', (req, res) => {
+    if (fs.existsSync(logFilePath)) {
+        res.send(fs.readFileSync(logFilePath, 'utf8'));
+    } else {
+        res.send('');
+    }
 });
 
 // Render the file manager page
@@ -194,11 +217,19 @@ app.post('/settings', express.json(), (req, res) => {
         console.log(`Updated startup script: ${startupScript}`);
         res.sendStatus(200);
     } else {
-        res.status(400).send('Invalid script');
+        res.send('');
     }
 });
 
 io.on('connection', (socket) => {
+    // Emit stored logs to the client
+    socket.emit('stored-logs', fs.existsSync(logFilePath) ? fs.readFileSync(logFilePath, 'utf8') : '');
+
+    socket.on('server-output', (msg) => {
+        appendLog(msg);
+        io.emit('server-output', msg);
+    });
+
     socket.on('start-server', () => {
         if (!mcProcess) {
             // Use custom or default startup script

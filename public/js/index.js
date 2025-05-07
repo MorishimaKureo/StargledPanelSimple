@@ -80,6 +80,12 @@ socket.on('system-stats', ({ cpuUsage, ramUsage, serverFolderSize }) => {
 });
 
 // Listen for server output
+socket.on('stored-logs', (logs) => {
+    const consoleOutput = document.getElementById('console-output');
+    consoleOutput.textContent = logs;
+    consoleOutput.scrollTop = consoleOutput.scrollHeight;
+});
+
 socket.on('server-output', (msg) => {
     const consoleOutput = document.getElementById('console-output');
     consoleOutput.textContent += msg + '\n';
