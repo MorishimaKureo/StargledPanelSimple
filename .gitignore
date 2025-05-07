@@ -135,9 +135,12 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-server\cache
-server\libraries
-server\logs
-server\plugins
-server\versions
-server\eula.txt
+# server
+/workspaces/StargledPanelSimple/server/cache
+/workspaces/StargledPanelSimple/server/cache/mojang_1.21.4.jar
+/workspaces/StargledPanelSimple/server/libraries
+/workspaces/StargledPanelSimple/server/logs
+/workspaces/StargledPanelSimple/server/plugins
+/workspaces/StargledPanelSimple/server/versions
+/workspaces/StargledPanelSimple/server/eula.txt
+/workspaces/StargledPanelSimple/server/server.properties
