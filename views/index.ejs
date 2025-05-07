@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Minecraft Server Panel</title>
+    <link rel="stylesheet" href="/css/global.css">
+</head>
+<body>
+    <%- include('partials/sidebar', { page: page }) %>
+    <%- include('partials/header') %>
+    <div id="main-content">
+        <div id="console-section">
+            <h1>Minecraft Server Control Panel</h1>
+            <button onclick="startServer()">Start Server</button>
+            <button onclick="stopServer()">Stop Server</button>
+            <button onclick="clearLog()">Clear Log</button>
+            <button id="kill-btn" style="background:#c00;color:#fff;margin-left:10px;">Kill</button>
+            <div class="console-container">
+                <div id="console-output"></div>
+            </div>
+            <input id="command-input" type="text" placeholder="Type command..." />
+            <button onclick="sendCommand()">Send</button>
+        </div>
+    </div>
+    <%- include('partials/footer') %>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        // Sidebar navigation
+        function showSection(section) {
+            document.getElementById('console-section').classList.add('hidden');
+            document.getElementById('filemanager-section').classList.add('hidden');
+            document.getElementById('console-tab').classList.remove('active');
+            document.getElementById('filemanager-tab').classList.remove('active');
+            if (section === 'console') {
+                document.getElementById('console-section').classList.remove('hidden');
+                document.getElementById('console-tab').classList.add('active');
+            } else {
+                document.getElementById('filemanager-section').classList.remove('hidden');
+                document.getElementById('filemanager-tab').classList.add('active');
+                fetchFiles();
+            }
+        }
+
+        // Console output
+        const consoleOutput = document.getElementById('console-output');
+        socket.on('server-output', msg => {
+            consoleOutput.textContent += msg + '\n';
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        });
+
+        function startServer() { socket.emit('start-server'); }
+        function stopServer() { socket.emit('stop-server'); }
+        function sendCommand() {
+            const cmd = document.getElementById('command-input').value;
+            socket.emit('send-command', cmd);
+            document.getElementById('command-input').value = '';
+        }
+
+        function clearLog() {
+            consoleOutput.textContent = '';
+        }
+
+        // File manager
+        function fetchFiles() {
+            fetch('/files')
+                .then(res => res.json())
+                .then(files => {
+                    const list = document.getElementById('file-list');
+                    list.innerHTML = '';
+                    if (files.length === 0) {
+                        list.textContent = 'No files found.';
+                    } else {
+                        files.forEach(file => {
+                            const div = document.createElement('div');
+                            div.className = 'file-item';
+                            div.textContent = file;
+                            list.appendChild(div);
+                        });
+                    }
+                });
+        }
+        document.getElementById('kill-btn').onclick = function() {
+            if (confirm('Are you sure you want to force kill the server process?')) {
+                socket.emit('kill-server');
+            }
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Settings - Stargled Panel</title>
+    <link rel="stylesheet" href="/css/global.css">
+</head>
+<body>
+    <%- include('partials/sidebar', { page: page }) %>
+    <%- include('partials/header') %>
+    <div id="main-content">
+        <h1>Settings</h1>
+        <form id="settings-form">
+            <label for="startup-script">Startup Script:</label><br>
+            <textarea id="startup-script" name="startupScript"><%= startupScript %></textarea><br>
+            <button type="submit">Save</button>
+        </form>
+        <div id="status"></div>
+    </div>
+    <%- include('partials/footer') %>
+    <script>
+        document.getElementById('settings-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            fetch('/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    startupScript: document.getElementById('startup-script').value.trim()
+                })
+            })
+            .then(res => {
+                if (res.ok) {
+                    document.getElementById('status').textContent = 'Saved!';
+                } else {
+                    res.text().then(msg => document.getElementById('status').textContent = msg);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
