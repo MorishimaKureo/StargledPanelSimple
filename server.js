@@ -88,6 +88,7 @@ app.get('/download', (req, res) => {
     if (!file) return res.status(400).send('No file specified');
     const filePath = path.join(__dirname, 'server', file);
     if (!fs.existsSync(filePath)) return res.status(404).send('File not found');
+    console.log(`Downloading file: ${file}`);
     res.download(filePath);
 });
 
@@ -99,6 +100,7 @@ app.delete('/delete', (req, res) => {
     if (!fs.existsSync(filePath)) return res.status(404).send('File not found');
     fs.unlink(filePath, err => {
         if (err) return res.status(500).send('Failed to delete');
+        console.log(`Deleted file: ${file}`);
         res.sendStatus(200);
     });
 });
@@ -115,6 +117,7 @@ app.post('/create-file', express.json(), (req, res) => {
     }
     fs.writeFile(filePath, '', err => {
         if (err) return res.status(500).send('Failed to create file');
+        console.log(`Created file: ${fileName}`);
         res.sendStatus(200);
     });
 });
@@ -131,6 +134,7 @@ app.post('/create-folder', express.json(), (req, res) => {
     }
     fs.mkdir(folderPath, err => {
         if (err) return res.status(500).send('Failed to create folder');
+        console.log(`Created folder: ${folderName}`);
         res.sendStatus(200);
     });
 });
@@ -147,6 +151,7 @@ app.post('/upload', upload.single('file'), (req, res) => {
     }
     fs.rename(req.file.path, destPath, err => {
         if (err) return res.status(500).send('Failed to save file');
+        console.log(`Uploaded file: ${req.file.originalname}`);
         res.sendStatus(200);
     });
 });
@@ -186,6 +191,7 @@ app.post('/settings', express.json(), (req, res) => {
     if (startupScript && typeof startupScript === 'string') {
         settings.startupScript = startupScript;
         saveSettings(settings);
+        console.log(`Updated startup script: ${startupScript}`);
         res.sendStatus(200);
     } else {
         res.status(400).send('Invalid script');
@@ -206,28 +212,35 @@ io.on('connection', (socket) => {
 
             mcProcess.stdout.on('data', (data) => {
                 io.emit('server-output', data.toString());
+                console.log(`Server output: ${data.toString().trim()}`);
             });
 
             mcProcess.stderr.on('data', (data) => {
                 io.emit('server-output', data.toString());
+                console.error(`Server error: ${data.toString().trim()}`);
             });
 
             mcProcess.on('close', (code) => {
                 io.emit('server-output', `Server stopped with code ${code}`);
+                console.log(`Server stopped with code ${code}`);
                 mcProcess = null;
             });
+
+            console.log('Server started');
         }
     });
 
     socket.on('stop-server', () => {
         if (mcProcess) {
             mcProcess.stdin.write('stop\n');
+            console.log('Server stop command sent');
         }
     });
 
     socket.on('send-command', (cmd) => {
         if (mcProcess) {
             mcProcess.stdin.write(cmd + '\n');
+            console.log(`Command sent: ${cmd}`);
         }
     });
 
@@ -236,6 +249,7 @@ io.on('connection', (socket) => {
             mcProcess.kill('SIGKILL');
             mcProcess = null;
             io.emit('server-output', 'Server process killed!');
+            console.log('Server process killed');
         }
     });
 });
@@ -264,6 +278,7 @@ app.post('/save', express.json(), (req, res) => {
     }
     fs.writeFile(filePath, content, err => {
         if (err) return res.status(500).send('Failed to save file');
+        console.log(`File saved: ${file}`);
         res.sendStatus(200);
     });
 });
@@ -285,6 +300,7 @@ app.post('/rename', express.json(), (req, res) => {
     }
     fs.rename(oldPath, newPath, err => {
         if (err) return res.status(500).send('Failed to rename');
+        console.log(`Renamed from ${oldName} to ${newName}`);
         res.sendStatus(200);
     });
 });
