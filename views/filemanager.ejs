@@ -71,6 +71,12 @@
                                     currentPath = currentPath ? currentPath + '/' + file.name : file.name;
                                     fetchFiles();
                                 };
+                            } else {
+                                // Add onclick event to open file for editing
+                                nameSpan.style.cursor = 'pointer';
+                                nameSpan.onclick = () => {
+                                    window.location.href = `/edit?file=${encodeURIComponent((currentPath ? currentPath + '/' : '') + file.name)}`;
+                                };
                             }
                             div.appendChild(nameSpan);
 
@@ -105,17 +111,9 @@
                             };
                             menu.appendChild(renameBtn);
 
-                            // Only show Edit/Download for files (not folders)
+                            // Remove the Edit button
+                            // Only show Download for files (not folders)
                             if (!file.isDirectory) {
-                                const editBtn = document.createElement('button');
-                                editBtn.textContent = 'Edit';
-                                editBtn.onclick = (e) => {
-                                    e.stopPropagation();
-                                    hideAllMenus();
-                                    window.location.href = `/edit?file=${encodeURIComponent((currentPath ? currentPath + '/' : '') + file.name)}`;
-                                };
-                                menu.appendChild(editBtn);
-
                                 const downloadBtn = document.createElement('button');
                                 downloadBtn.textContent = 'Download';
                                 downloadBtn.onclick = (e) => {

@@ -207,7 +207,7 @@ footer {
 }
 
 /* Make modal fit small screens */
-@media (max-width: 500px) {
+@media (max-width: 250px) {
     #name-modal > div {
         min-width: 90vw !important;
         max-width: 98vw !important;
