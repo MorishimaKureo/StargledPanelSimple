@@ -11,8 +11,8 @@
       "id": "bungee",
       "name": "bungee",
       "path": "./servers/bungee",
-      "startup": "java -Xmx2G -jar paper.jar nogui",
-      "status": "stopped"
+      "startup": "java -Xmx2G -jar server.jar nogui",
+      "status": "running"
     }
   ]
 }

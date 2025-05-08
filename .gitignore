@@ -144,4 +144,10 @@ servers\lobby\versions
 servers\lobby\eula.txt
 servers\lobby\server.properties
 
+servers/bungee/lang
+servers/bungee/logs
+servers/bungee/plugins
+servers/bungee/forwarding.secret
+servers/bungee/velocity.toml
+
 StargledPanelSimple.zip
