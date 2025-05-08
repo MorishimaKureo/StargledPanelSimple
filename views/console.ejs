@@ -12,9 +12,9 @@
     <%- include('partials/sidebar', { page: 'console', serverId: serverId }) %>
     <%- include('partials/header') %>
     <div id="main-content">
-        <h1>Console: <%= server.id %></h1>
+        <h1>Console: <%= serverId %></h1>
         <div class="console-header">
-            <h2>Console - <%= server.id %></h2>
+            <h2>Console - <%= serverId %></h2>
             <div class="server-actions">
                 <button id="startButton" <%= server.status === 'running' ? 'disabled' : '' %>>Start</button>
                 <button id="stopButton" <%= server.status !== 'running' ? 'disabled' : '' %>>Stop</button>
