@@ -393,8 +393,8 @@ app.get('/console/:id', (req, res) => {
     res.render('console', { 
         server: {
             id: server.id,
-            status: server.status,
-            name: server.name
+            name: server.name,  // Add this line
+            status: server.status
         }
     });
 });
