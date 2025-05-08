@@ -142,6 +142,6 @@ Akses dari tombol “File Manager” per server.
 
 ## 📄 Lisensi
 
-MIT License © 2025 StargledMC
+GPL License © 2025 StargledMC
 
 ---
