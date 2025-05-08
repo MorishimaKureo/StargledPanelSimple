@@ -228,7 +228,6 @@ io.on('connection', (socket) => {
         console.error('Error reading logs:', e);
         socket.emit('stored-logs', 'Error loading server logs');
     }
-});
 
     // Place socket event handlers inside this block
     socket.on('start-server', () => {
@@ -282,7 +281,7 @@ io.on('connection', (socket) => {
             console.log('Server process killed');
         }
     });
-});
+}); // Correctly close the io.on('connection') block
 
 // Get file content for editing
 app.get('/edit', (req, res) => {

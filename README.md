@@ -18,7 +18,7 @@ StargledPanelSimple is a web-based server management panel designed to facilitat
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/yourusername/StargledPanelSimple.git
+   git clone https://github.com/MorishimaKureo/StargledPanelSimple.git
    ```
 
 2. **Navigate to the project directory**:
