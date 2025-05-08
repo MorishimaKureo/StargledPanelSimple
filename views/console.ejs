@@ -10,12 +10,12 @@
     <!-- Removed inline <style> -->
 </head>
 <body>
-    <%- include('partials/sidebar', { page: 'console', serverId: serverId }) %>
+    <%- include('partials/sidebar', { page: 'console', 'server.id': 'server.id' }) %>
     <%- include('partials/header') %>
     <div id="main-content">
-        <h1>Console: <%= serverId %></h1>
+        <h1>Console: <%= 'server.id' %></h1>
         <div class="console-header">
-            <h2>Console - <%= serverId %></h2>
+            <h2>Console - <%= 'server.id' %></h2>
             <div class="server-actions">
                 <button id="startButton" <%= server.status === 'running' ? 'disabled' : '' %>>Start</button>
                 <button id="stopButton" <%= server.status !== 'running' ? 'disabled' : '' %>>Stop</button>
@@ -29,7 +29,7 @@
     </div>
     <%- include('partials/footer') %>
     <script>
-    const serverId = "<%= serverId %>";
+    const server.id = "<%= 'server.id' %>";
     </script>
     <script src="/public/js/console.js"></script>
 </body>

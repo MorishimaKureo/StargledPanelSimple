@@ -136,13 +136,13 @@ dist
 .pnp.*
 
 # server
-servers\lobby\cache
-servers\lobby\libraries
-servers\lobby\logs
-servers\lobby\plugins
-servers\lobby\versions
-servers\lobby\eula.txt
-servers\lobby\server.properties
+servers/lobby/cache
+servers/lobby/libraries
+servers/lobby/logs
+servers/lobby/plugins
+servers/lobby/versions
+servers/lobby/eula.txt
+servers/lobby/server.properties
 
 servers/bungee/lang
 servers/bungee/logs
