@@ -13,6 +13,13 @@
     <%- include('partials/header') %>
     <div id="main-content">
         <h1>Console: <%= serverName %></h1>
+        <div class="console-header">
+            <h2>Console - <%= server.id %></h2>
+            <div class="server-actions">
+                <button id="startButton" <%= server.status === 'running' ? 'disabled' : '' %>>Start</button>
+                <button id="stopButton" <%= server.status !== 'running' ? 'disabled' : '' %>>Stop</button>
+            </div>
+        </div>
         <div id="console-log"></div>
         <form id="console-form" autocomplete="off">
             <input id="console-input" type="text" placeholder="Type command..." autofocus autocomplete="off" />

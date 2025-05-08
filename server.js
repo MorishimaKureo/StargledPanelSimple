@@ -389,9 +389,14 @@ io.on('connection', (socket) => {
 
 // Console page per server
 app.get('/console/:id', (req, res) => {
-    const srv = serverManager.getServer(req.params.id);
-    if (!srv) return res.status(404).send('Not found');
-    res.render('console', { serverId: srv.id, serverName: srv.name });
+    const server = serverManager.getAllServers().find(s => s.id === req.params.id);
+    res.render('console', { 
+        server: {
+            id: server.id,
+            status: server.status,
+            name: server.name
+        }
+    });
 });
 
 // API to send command to server process

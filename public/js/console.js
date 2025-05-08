@@ -40,3 +40,21 @@ document.getElementById('console-form').addEventListener('submit', function(e) {
 
 window.addEventListener('DOMContentLoaded', subscribeLog);
 window.addEventListener('beforeunload', unsubscribeLog);
+
+document.getElementById('startButton').onclick = function() {
+    const serverId = window.location.pathname.split('/')[2];
+    fetch(`/api/server/${serverId}/start`, { method: 'POST' })
+        .then(() => {
+            document.getElementById('startButton').disabled = true;
+            document.getElementById('stopButton').disabled = false;
+        });
+};
+
+document.getElementById('stopButton').onclick = function() {
+    const serverId = window.location.pathname.split('/')[2];
+    fetch(`/api/server/${serverId}/stop`, { method: 'POST' })
+        .then(() => {
+            document.getElementById('stopButton').disabled = true;
+            document.getElementById('startButton').disabled = false;
+        });
+};
