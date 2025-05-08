@@ -1,231 +1,108 @@
-html, body {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-}
-
+/* Windows 11 Fluent Design - Global Styles */
 body {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+    margin: 0;
+    font-family: 'Segoe UI Variable', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #f3f6fd 0%, #e9ecf5 100%);
+    color: #1a1a1a;
+    -webkit-font-smoothing: antialiased;
 }
 
 #main-content {
-    flex: 1 0 auto;
+    margin-left: 240px;
+    padding: 32px;
+    min-height: calc(100vh - 120px);
+    background: rgba(255,255,255,0.7);
+    border-radius: 18px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+    backdrop-filter: blur(16px);
+    transition: background 0.3s;
 }
 
-footer {
-    flex-shrink: 0;
-}
-
-#main-content {
-    margin-left: 180px;
-    padding: 30px;
-}
-
-#main-content h1 {
-    font-size: 2em;
-    margin-bottom: 20px;
-}
-
-.chart-container {
-    background: #f8f8f8;
-    border-radius: 8px;
-    padding: 10px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    display: inline-block;
-}
-
-#main-content form {
-    margin-bottom: 20px;
-}
-
-#main-content textarea {
-    width: 100%;
-    height: 60px;
-    font-family: monospace;
-    font-size: 15px;
-    margin-bottom: 15px;
-}
-
-#main-content button {
-    padding: 6px 18px;
-    font-size: 15px;
-    cursor: pointer;
-}
-
-.console-container {
-    background: #111;
-    border-radius: 8px;
-    padding: 12px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    max-width: 100%;
-    min-height: 200px;
-}
-
-#console-output {
-    width: 100%;
-    height: 300px;
-    background: #111;
-    color: #0f0;
-    overflow-y: auto;
-    font-family: monospace;
-    padding: 10px;
-    border-radius: 4px;
-    box-sizing: border-box;
-    border: 1px solid #222;
-    white-space: pre-wrap; /* This ensures text wraps to the next line */
-    word-break: break-word; /* This breaks long words if needed */
-}
-
-.file-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 6px 0;
-    border-bottom: 1px solid #222;
-    position: relative;
-}
-
-.file-name {
-    flex: 1;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.action-menu-btn {
-    background: none;
-    border: none;
-    font-size: 22px;
-    cursor: pointer;
-    padding: 2px 8px;
-    color: #555;
-    transition: background 0.2s;
-    border-radius: 4px;
-}
-
-.action-menu-btn:hover,
-.action-menu-btn:focus {
-    background: #eee;
-}
-
-.action-menu {
-    display: none;
-    position: absolute;
-    right: 0;
-    top: 28px;
-    background: #fff;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-    min-width: 120px;
-    z-index: 10;
-    flex-direction: column;
-    padding: 4px 0;
-}
-
-.action-menu.show {
-    display: flex;
-}
-
-.action-menu button {
-    background: none;
-    border: none;
-    width: 100%;
-    text-align: left;
-    padding: 8px 16px;
-    font-size: 15px;
-    cursor: pointer;
-    color: #222;
-    transition: background 0.2s;
-}
-
-.action-menu button:hover {
-    background: #f0f0f0;
-    color: #c00;
-}
-
-#file-content {
-    width: 100%;
-    height: 100%;  /* Adjust height as needed */
-    box-sizing: border-box; /* Include padding and border in element's total width and height */
-}
-
-
-/* Responsive adjustments */
 @media (max-width: 900px) {
     #main-content {
         margin-left: 0;
-        padding: 16px;
+        padding: 18px;
+        border-radius: 0;
+        min-height: calc(100vh - 80px);
     }
-    #sidebar {
-        position: static;
+    body {
+        font-size: 1rem;
+    }
+    button,
+    input[type="button"],
+    input[type="submit"] {
         width: 100%;
-        height: auto;
-        display: flex;
-        flex-direction: row;
-        justify-content: space-around;
-        margin-bottom: 16px;
+        min-width: 0;
+        box-sizing: border-box;
+        margin: 10px 0;
+        font-size: 1.08rem;
+        padding: 14px 0;
     }
-    #sidebar a {
-        display: inline-block;
-        padding: 10px 12px;
-        font-size: 1em;
+    input[type="text"],
+    input[type="password"],
+    input[type="email"] {
+        width: 100%;
+        font-size: 1.08rem;
+        padding: 14px 10px;
+        box-sizing: border-box;
     }
-    footer {
-        margin-left: 0;
-    }
-}
-
-@media (max-width: 600px) {
-    #main-content {
-        padding: 8px;
-    }
-    h1 {
+    h1, h2, h3 {
         font-size: 1.3em;
     }
     .file-item {
         flex-direction: column;
         align-items: flex-start;
-        padding: 8px 0;
+        padding: 12px 10px;
     }
-    .file-name {
-        font-size: 1em;
-        margin-bottom: 4px;
-    }
-    .action-menu-btn {
-        font-size: 1.3em;
-        padding: 2px 6px;
-    }
-    .action-menu {
-        right: 0;
-        left: auto;
-        min-width: 100px;
-        top: 32px;
-    }
-    #sidebar {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    #sidebar a {
-        font-size: 1em;
-        padding: 10px 0;
-        border-bottom: 1px solid #eee;
-    }
-    footer {
-        font-size: 0.9em;
-        padding: 8px 6px;
+    .sidebar-logo img {
+        width: 48px !important;
+        height: 48px !important;
     }
 }
 
-/* Make modal fit small screens */
-@media (max-width: 250px) {
-    #name-modal > div {
-        min-width: 90vw !important;
-        max-width: 98vw !important;
-        padding: 10px !important;
-    }
+/* Extra: Prevent horizontal scroll on small screens */
+html, body {
+    max-width: 100vw;
+    overflow-x: hidden;
+}
+
+button,
+input[type="button"],
+input[type="submit"] {
+    background: linear-gradient(90deg, #e3f0ff 0%, #d0e7ff 100%);
+    color: #0078d4;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 22px;
+    font-size: 1rem;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+    outline: none;
+    margin: 0 6px;
+    letter-spacing: 0.01em;
+}
+
+button:hover,
+input[type="button"]:hover,
+input[type="submit"]:hover {
+    background: linear-gradient(90deg, #d0e7ff 0%, #e3f0ff 100%);
+    color: #005fb8;
+    box-shadow: 0 4px 16px rgba(0,120,212,0.10);
+}
+
+button:active,
+input[type="button"]:active,
+input[type="submit"]:active {
+    background: #e3f0ff;
+    color: #005fb8;
+    box-shadow: 0 2px 6px rgba(0,120,212,0.08);
+}
+
+button:focus,
+input[type="button"]:focus,
+input[type="submit"]:focus {
+    outline: 2px solid #0078d4;
+    outline-offset: 2px;
 }

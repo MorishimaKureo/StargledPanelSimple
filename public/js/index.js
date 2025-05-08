@@ -1,122 +1,105 @@
 const socket = io();
-let cpuUsageChart, ramUsageChart, serverFolderSizeChart; // Declare variables to hold chart instances
+let currentLogServerId = null;
+let logBuffer = '';
+let logSubscribed = false;
 
-socket.on('system-stats', ({ cpuUsage, ramUsage, serverFolderSize }) => {
-    document.getElementById('cpu-usage').textContent = `CPU Usage: ${cpuUsage.toFixed(2)}%`;
-    document.getElementById('ram-usage').textContent = `RAM Usage: ${ramUsage.toFixed(2)} MB`;
-    document.getElementById('server-folder-size').textContent = `Server Folder Size: ${serverFolderSize.toFixed(2)} GB`;
+// Render server list
+function renderServers() {
+    fetch('/api/servers')
+        .then(res => res.json())
+        .then(data => {
+            const list = document.getElementById('server-list');
+            list.innerHTML = '';
+            data.servers.forEach(srv => {
+                const div = document.createElement('div');
+                div.className = 'server-item';
+                div.innerHTML = `
+                    <strong class="server-link" style="cursor:pointer;color:#007bff;text-decoration:underline;" data-id="${srv.id}">${srv.name}</strong> (${srv.id})<br>
+                    Status: <span style="color:${srv.status === 'running' ? 'green' : 'red'}">${srv.status}</span>
+                    <div class="server-actions" style="margin-top:8px;">
+                        <button onclick="startServer('${srv.id}')" ${srv.status === 'running' ? 'disabled' : ''}>Start</button>
+                        <button onclick="stopServer('${srv.id}')" ${srv.status !== 'running' ? 'disabled' : ''}>Stop</button>
+                        <button onclick="deleteServer('${srv.id}')">Delete</button> <!-- Added Delete Button -->
+                    </div>
+                `;
+                list.appendChild(div);
+                
+                // Add click event to server name to go to console page
+                div.querySelector('.server-link').onclick = function() {
+                    window.location = `/console/${srv.id}`;
+                };
+            });
+        });
+}
 
-    // Destroy existing chart instances if they exist
-    if (cpuUsageChart) cpuUsageChart.destroy();
-    if (ramUsageChart) ramUsageChart.destroy();
-    if (serverFolderSizeChart) serverFolderSizeChart.destroy();
+function startServer(id) {
+    fetch(`/api/server/${id}/start`, { method: 'POST' })
+        .then(renderServers);
+}
 
-    // Update CPU usage graph
-    const cpuCtx = document.getElementById('cpu-usage-chart').getContext('2d');
-    cpuUsageChart = new Chart(cpuCtx, {
-        type: 'line',
-        data: {
-            labels: Array.from({ length: 10 }, (_, i) => i),
-            datasets: [{
-                label: 'CPU Usage (%)',
-                data: Array(10).fill(cpuUsage),
-                borderColor: 'rgba(75, 192, 192, 1)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    max: 100
-                }
-            }
-        }
-    });
+function stopServer(id) {
+    fetch(`/api/server/${id}/stop`, { method: 'POST' })
+        .then(renderServers);
+}
 
-    // Update RAM usage graph
-    const ramCtx = document.getElementById('ram-usage-chart').getContext('2d');
-    ramUsageChart = new Chart(ramCtx, {
-        type: 'line',
-        data: {
-            labels: Array.from({ length: 10 }, (_, i) => i),
-            datasets: [{
-                label: 'RAM Usage (MB)',
-                data: Array(10).fill(ramUsage),
-                borderColor: 'rgba(255, 99, 132, 1)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
-    });
+// Log Modal Logic
+function openLogModal(serverId, serverName) {
+    currentLogServerId = serverId;
+    logBuffer = '';
+    document.getElementById('log-modal-title').textContent = `Console: ${serverName}`;
+    document.getElementById('log-output').textContent = 'Loading...';
+    document.getElementById('log-modal').style.display = 'flex';
+    subscribeLog(serverId);
+}
 
-    // Update Server Folder Size graph
-    const serverSizeCtx = document.getElementById('server-folder-size-chart').getContext('2d');
-    serverFolderSizeChart = new Chart(serverSizeCtx, {
-        type: 'line',
-        data: {
-            labels: Array.from({ length: 10 }, (_, i) => i),
-            datasets: [{
-                label: 'Server Folder Size (GB)',
-                data: Array(10).fill(serverFolderSize),
-                borderColor: 'rgba(54, 162, 235, 1)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
-    });
+function closeLogModal() {
+    document.getElementById('log-modal').style.display = 'none';
+    unsubscribeLog();
+}
+
+document.getElementById('close-log-btn').onclick = closeLogModal;
+
+// Socket.IO log streaming
+function subscribeLog(serverId) {
+    if (logSubscribed && currentLogServerId) {
+        socket.emit('unsubscribe-log', currentLogServerId);
+    }
+    socket.emit('subscribe-log', serverId);
+    logSubscribed = true;
+}
+
+function unsubscribeLog() {
+    if (logSubscribed && currentLogServerId) {
+        socket.emit('unsubscribe-log', currentLogServerId);
+        logSubscribed = false;
+        currentLogServerId = null;
+    }
+}
+
+// Listen for log updates
+socket.on('server-log', ({ serverId, log }) => {
+    if (serverId !== currentLogServerId) return;
+    if (logBuffer.length > 100000) logBuffer = logBuffer.slice(-80000); // Prevent memory bloat
+    logBuffer += log;
+    const logOutput = document.getElementById('log-output');
+    logOutput.textContent += log;
+    if (logOutput.textContent.length > 100000) {
+        logOutput.textContent = logOutput.textContent.slice(-80000);
+    }
+    logOutput.scrollTop = logOutput.scrollHeight;
 });
 
-// Listen for server output
-socket.on('stored-logs', (logs) => {
-    const consoleOutput = document.getElementById('console-output');
-    consoleOutput.textContent = logs;
-    consoleOutput.scrollTop = consoleOutput.scrollHeight;
+// When modal opens, clear previous log
+document.getElementById('log-modal').addEventListener('show', function() {
+    document.getElementById('log-output').textContent = '';
 });
 
-socket.on('server-output', (msg) => {
-    const consoleOutput = document.getElementById('console-output');
-    consoleOutput.textContent += msg + '\n';
-    consoleOutput.scrollTop = consoleOutput.scrollHeight;
-});
-
-function startServer() {
-    socket.emit('start-server');
-    console.log('Server start command sent');
-}
-
-function stopServer() {
-    socket.emit('stop-server');
-    console.log('Server stop command sent');
-}
-
-function clearLog() {
-    const consoleOutput = document.getElementById('console-output');
-    consoleOutput.textContent = '';
-    console.log('Console log cleared');
-}
-
-function sendCommand() {
-    const cmd = document.getElementById('command-input').value;
-    socket.emit('send-command', cmd);
-    document.getElementById('command-input').value = '';
-}
-
-// Add event listener for Enter key on command input
-document.getElementById('command-input').addEventListener('keydown', function(event) {
-    if (event.key === 'Enter') {
-        sendCommand();
+// Close modal on Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && document.getElementById('log-modal').style.display === 'flex') {
+        closeLogModal();
     }
 });
+
+// Initial render
+renderServers();

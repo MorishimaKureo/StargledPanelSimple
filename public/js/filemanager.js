@@ -1,7 +1,7 @@
 let currentPath = '';
 
 function fetchFiles() {
-    fetch(`/files?path=${encodeURIComponent(currentPath)}`)
+    fetch(`/files/${serverId}?path=${encodeURIComponent(currentPath)}`)
         .then(res => res.json())
         .then(data => {
             const files = data.files;
@@ -16,6 +16,7 @@ function fetchFiles() {
                 files.forEach(file => {
                     const div = document.createElement('div');
                     div.className = 'file-item';
+                    div.style.position = 'relative';
 
                     // Icon for file/folder
                     const iconSpan = document.createElement('span');
@@ -29,16 +30,13 @@ function fetchFiles() {
                     nameSpan.textContent = file.name;
                     if (file.isDirectory) {
                         nameSpan.style.fontWeight = 'bold';
-                        nameSpan.style.cursor = 'pointer';
                         nameSpan.onclick = () => {
                             currentPath = currentPath ? currentPath + '/' + file.name : file.name;
                             fetchFiles();
                         };
                     } else {
-                        // Add onclick event to open file for editing
-                        nameSpan.style.cursor = 'pointer';
                         nameSpan.onclick = () => {
-                            window.location.href = `/edit?file=${encodeURIComponent((currentPath ? currentPath + '/' : '') + file.name)}`;
+                            window.location.href = `/edit/${serverId}?file=${encodeURIComponent((currentPath ? currentPath + '/' : '') + file.name)}`;
                         };
                     }
                     div.appendChild(nameSpan);
@@ -49,7 +47,7 @@ function fetchFiles() {
                     menuBtn.innerHTML = '&#8942;';
                     div.appendChild(menuBtn);
 
-                    // Action menu
+                    // Action menu (create but do not append to file item)
                     const menu = document.createElement('div');
                     menu.className = 'action-menu';
 
@@ -61,7 +59,7 @@ function fetchFiles() {
                         hideAllMenus();
                         showModal(`Rename "${file.name}" to:`, function(newName) {
                             if (!newName || newName === file.name) return;
-                            fetch('/rename', {
+                            fetch(`/rename/${serverId}`, {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({ oldName: (currentPath ? currentPath + '/' : '') + file.name, newName })
@@ -81,7 +79,7 @@ function fetchFiles() {
                         downloadBtn.onclick = (e) => {
                             e.stopPropagation();
                             hideAllMenus();
-                            window.open(`/download?file=${encodeURIComponent((currentPath ? currentPath + '/' : '') + file.name)}`);
+                            window.open(`/download/${serverId}?file=${encodeURIComponent((currentPath ? currentPath + '/' : '') + file.name)}`);
                         };
                         menu.appendChild(downloadBtn);
                     }
@@ -93,7 +91,7 @@ function fetchFiles() {
                         e.stopPropagation();
                         hideAllMenus();
                         if (confirm(`Delete ${file.name}?`)) {
-                            fetch(`/delete?file=${encodeURIComponent((currentPath ? currentPath + '/' : '') + file.name)}`, { method: 'DELETE' })
+                            fetch(`/delete/${serverId}?file=${encodeURIComponent((currentPath ? currentPath + '/' : '') + file.name)}`, { method: 'DELETE' })
                                 .then(res => {
                                     if (res.ok) fetchFiles();
                                     else alert('Failed to delete file');
@@ -108,7 +106,25 @@ function fetchFiles() {
                     menuBtn.onclick = function(e) {
                         e.stopPropagation();
                         hideAllMenus();
-                        menu.classList.toggle('show');
+                        // Position menu as popup
+                        const rect = menuBtn.getBoundingClientRect();
+                        menu.style.left = rect.left + 'px';
+                        menu.style.top = (rect.bottom + 4) + 'px';
+                        menu.classList.add('show');
+                        document.body.appendChild(menu);
+
+                        // Hide menu when clicking outside
+                        setTimeout(() => {
+                            document.addEventListener('mousedown', onBodyClick);
+                        }, 0);
+
+                        function onBodyClick(ev) {
+                            if (!menu.contains(ev.target)) {
+                                hideAllMenus();
+                            }
+                        }
+
+                        menu._onBodyClick = onBodyClick;
                     };
 
                     // Hide menu when clicking outside
@@ -130,8 +146,6 @@ document.getElementById('back-btn').onclick = function() {
     currentPath = parts.join('/');
     fetchFiles();
 };
-
-fetchFiles();
 
 // Modal logic
 let modalCallback = null;
@@ -163,10 +177,10 @@ document.getElementById('modal-input').addEventListener('keydown', function(e) {
 document.getElementById('new-file-btn').onclick = function() {
     showModal('New File Name:', function(fileName) {
         if (!fileName) return;
-        fetch('/create-file', {
+        fetch(`/create-file/${serverId}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ fileName })
+            body: JSON.stringify({ fileName: (currentPath ? currentPath + '/' : '') + fileName })
         })
         .then(res => {
             if (res.ok) fetchFiles();
@@ -179,10 +193,10 @@ document.getElementById('new-file-btn').onclick = function() {
 document.getElementById('new-folder-btn').onclick = function() {
     showModal('New Folder Name:', function(folderName) {
         if (!folderName) return;
-        fetch('/create-folder', {
+        fetch(`/create-folder/${serverId}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ folderName })
+            body: JSON.stringify({ folderName: (currentPath ? currentPath + '/' : '') + folderName })
         })
         .then(res => {
             if (res.ok) fetchFiles();
@@ -198,7 +212,8 @@ document.getElementById('upload-btn').onclick = function() {
 
 document.getElementById('hidden-file-input').onchange = function() {
     const formData = new FormData(document.getElementById('upload-form'));
-    fetch('/upload', {
+    formData.set('path', currentPath);
+    fetch(`/upload/${serverId}`, {
         method: 'POST',
         body: formData
     })
@@ -207,3 +222,5 @@ document.getElementById('hidden-file-input').onchange = function() {
         else res.text().then(msg => alert(msg));
     });
 };
+
+fetchFiles();

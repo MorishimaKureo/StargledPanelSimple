@@ -1,39 +1,47 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>File Manager - Minecraft Server Panel</title>
+    <title>File Manager - <%= serverName %></title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="/public/css/global.css">
+    <link rel="stylesheet" href="/public/css/filemanager.css">
+    <link rel="stylesheet" href="/public/css/modals.css">
+    <!-- Removed inline <style> -->
 </head>
 <body>
-    <%- include('partials/sidebar', { page: page }) %>
+    <%- include('partials/sidebar', { page: 'filemanager' }) %>
     <%- include('partials/header') %>
     <div id="main-content">
-        <h1>File Manager</h1>
-        <div id="current-path" style="margin-bottom:10px;font-size:14px;color:#888;"></div>
-        <button id="back-btn" style="display:none;margin-bottom:10px;">⬅ Back</button>
-        <button id="new-file-btn" style="margin-bottom:10px;">New File</button>
-        <button id="new-folder-btn" style="margin-bottom:10px;">New Folder</button>
-        <form id="upload-form" enctype="multipart/form-data" style="margin-bottom:15px;display:inline;">
-            <button type="button" id="upload-btn">Upload File</button>
-            <input type="file" id="hidden-file-input" name="file" style="display:none;" required />
-        </form>
+        <h1>File Manager: <%= serverName %></h1>
+        <div>
+            <button id="back-btn">Back</button>
+            <span id="current-path"></span>
+            <button id="new-file-btn">New File</button>
+            <button id="new-folder-btn">New Folder</button>
+            <button id="upload-btn">Upload</button>
+            <form id="upload-form" style="display:none;">
+                <input type="file" id="hidden-file-input" name="file" />
+                <input type="hidden" name="path" id="upload-path" />
+            </form>
+        </div>
         <div id="file-list"></div>
     </div>
-
-    <!-- Modal for entering name -->
-    <div id="name-modal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.4);z-index:1000;align-items:center;justify-content:center;">
-        <div style="background:#fff;padding:20px;border-radius:8px;min-width:300px;max-width:90vw;">
-            <h3 id="modal-title"></h3>
-            <input type="text" id="modal-input" style="width:100%;margin-bottom:10px;" />
-            <div style="text-align:right;">
-                <button id="modal-cancel">Cancel</button>
+    <!-- Modal for new file/folder/rename -->
+    <div id="name-modal">
+        <div id="name-modal-content">
+            <label id="modal-title"></label>
+            <input id="modal-input" type="text" autocomplete="off" />
+            <div>
                 <button id="modal-ok">OK</button>
+                <button id="modal-cancel">Cancel</button>
             </div>
         </div>
     </div>
-
     <%- include('partials/footer') %>
-    <script src="/js/filemanager.js"></script>
+    <script>
+    // Pass serverId to JS
+    const serverId = "<%= serverId %>";
+    </script>
+    <script src="/public/js/filemanager.js"></script>
 </body>
 </html>

@@ -1,8 +1,76 @@
-<link rel="stylesheet" href="/css/sidebar.css">
+<link rel="stylesheet" href="/public/css/sidebar.css">
 <button id="sidebar-toggle">&#9776;</button>
-<div id="sidebar">
-    <a href="/" class="<%= page === 'console' ? 'active' : '' %>">Console</a>
-    <a href="/filemanager" class="<%= page === 'filemanager' ? 'active' : '' %>">File Manager</a>
-    <a href="/settings" class="<%= page === 'settings' ? 'active' : '' %>">Settings</a>
-</div>
+<nav id="sidebar">
+    <!-- Logo at the top of the sidebar -->
+    <div class="sidebar-logo" style="text-align:center; margin-bottom: 24px;">
+        <a href="/">
+            <img src="/public/logo.webp" alt="Logo" style="width: 64px; height: 64px; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);" />
+        </a>
+    </div>
+    <% if (typeof serverId !== 'undefined') { %>
+        <a href="/console/<%= serverId %>" class="<%= page === 'console'? 'active' : '' %>">Console</a>
+        <a href="/filemanager/<%= serverId %>" class="<%= page === 'filemanager'? 'active' : '' %>">File Manager</a>
+        <a href="/settings/<%= serverId %>" class="<%= page === 'settings'? 'active' : '' %>">Settings</a>
+    <% } else { %>
+        <a href="https://github.com/MorishimaKureo" class="<%= page === 'filemanager' ? 'github' : '' %>">Github</a>
+        <a href="https://github.com/MorishimaKureo/StargledPanelSimple" class="<%= page === 'project' ? 'active' : '' %>">Project</a>
+    <% } %>
+</nav>
 <div id="sidebar-overlay"></div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var sidebar = document.getElementById('sidebar');
+    var toggle = document.getElementById('sidebar-toggle');
+    var overlay = document.getElementById('sidebar-overlay');
+
+    function setHamburgerIcon(isOpen) {
+        const icon = toggle.querySelector('.sidebar-toggle-icon');
+        if (isOpen) {
+            icon.classList.add('close');
+        } else {
+            icon.classList.remove('close');
+        }
+    }
+
+    function openSidebar() {
+        sidebar.classList.add('open');
+        sidebar.classList.remove('closed');
+        toggle.classList.add('top-right');
+        toggle.innerHTML = '&times;';
+        document.body.classList.add('sidebar-open');
+        overlay.style.display = 'block';
+    }
+
+    function closeSidebar() {
+        sidebar.classList.remove('open');
+        sidebar.classList.add('closed');
+        toggle.classList.remove('top-right');
+        toggle.innerHTML = '&#9776;';
+        document.body.classList.remove('sidebar-open');
+        overlay.style.display = 'none';
+    }
+
+    if (toggle) {
+        toggle.onclick = function() {
+            if (sidebar.classList.contains('open')) {
+                closeSidebar();
+            } else {
+                openSidebar();
+            }
+        };
+    }
+
+    if (overlay) {
+        overlay.onclick = closeSidebar;
+    }
+
+    // Close sidebar when a sidebar link is clicked (on mobile)
+    sidebar.querySelectorAll('a').forEach(function(link) {
+        link.addEventListener('click', function() {
+            if (window.innerWidth <= 900) {
+                closeSidebar();
+            }
+        });
+    });
+});
+</script>

@@ -3,10 +3,11 @@
 <head>
     <title>Settings - Stargled Panel</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="/public/css/global.css">
+    <link rel="stylesheet" href="/public/css/settings.css">
 </head>
 <body>
-    <%- include('partials/sidebar', { page: page }) %>
+    <%- include('partials/sidebar', { page: 'settings' }) %>
     <%- include('partials/header') %>
     <div id="main-content">
         <h1>Settings</h1>
@@ -19,9 +20,11 @@
     </div>
     <%- include('partials/footer') %>
     <script>
+        const serverId = "<%= serverId %>"; // Add this line
+
         document.getElementById('settings-form').addEventListener('submit', function(e) {
             e.preventDefault();
-            fetch('/settings', {
+            fetch(`/settings/${serverId}`, { // Use the correct endpoint
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

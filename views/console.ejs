@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Console - <%= serverName %></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/public/css/global.css">
+    <link rel="stylesheet" href="/public/css/console.css">
+    <script src="/socket.io/socket.io.js"></script>
+    <!-- Removed inline <style> -->
+</head>
+<body>
+    <%- include('partials/sidebar', { page: 'console', serverId: serverId }) %>
+    <%- include('partials/header') %>
+    <div id="main-content">
+        <h1>Console: <%= serverName %></h1>
+        <div id="console-log"></div>
+        <form id="console-form" autocomplete="off">
+            <input id="console-input" type="text" placeholder="Type command..." autofocus autocomplete="off" />
+            <button id="console-send" type="submit">Send</button>
+        </form>
+    </div>
+    <%- include('partials/footer') %>
+    <script>
+    const serverId = "<%= serverId %>";
+    </script>
+    <script src="/public/js/console.js"></script>
+</body>
+</html>

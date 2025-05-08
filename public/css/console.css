@@ -1,0 +1,67 @@
+/* Windows 11 Console Styles */
+#console-log {
+    white-space: pre-line;
+    background: rgba(30, 30, 30, 0.96);
+    color: #e3e3e3;
+    padding: 28px 28px 18px 28px;
+    border-radius: 18px;
+    height: 480px;
+    overflow-y: auto;
+    font-family: 'Cascadia Mono', 'Consolas', monospace;
+    margin-bottom: 28px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    border: 1.5px solid #232323;
+    outline: 2.5px solid #0078d4;
+    outline-offset: -4px;
+    transition: box-shadow 0.2s, outline 0.2s;
+}
+
+#console-log:focus-within {
+    box-shadow: 0 12px 36px rgba(0,120,212,0.18);
+    outline: 2.5px solid #005fb8;
+}
+
+#console-form {
+    display: flex;
+    align-items: center;
+    background: rgba(255,255,255,0.92);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    padding: 14px 18px;
+    margin-bottom: 8px;
+}
+
+#console-input {
+    width: calc(100% - 110px);
+    padding: 12px;
+    border: 1.5px solid #0078d4;
+    border-radius: 8px;
+    margin-right: 12px;
+    font-size: 1rem;
+    background: rgba(255,255,255,0.97);
+    color: #222;
+    transition: border 0.2s;
+}
+
+#console-input:focus {
+    border: 1.5px solid #005fb8;
+    outline: none;
+}
+
+#console-form button, #console-send {
+    background: linear-gradient(90deg, #e3f0ff 0%, #d0e7ff 100%);
+    color: #0078d4;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 22px;
+    font-size: 1rem;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+#console-form button:hover, #console-send:hover {
+    background: linear-gradient(90deg, #d0e7ff 0%, #e3f0ff 100%);
+    color: #005fb8;
+}

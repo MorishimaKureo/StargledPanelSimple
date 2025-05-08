@@ -1,7 +1,8 @@
-<link rel="stylesheet" href="/css/footer.css">
+<link rel="stylesheet" href="public/css/footer.css">
 <footer>
-    &copy; <%= new Date().getFullYear() %> Stargled Panel
+    <a href="https://github.com/MorishimaKureo/StargledPanelSimple">&copy; <%= new Date().getFullYear() %> Stargled Panel</a>
 </footer>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     var sidebar = document.getElementById('sidebar');
@@ -11,8 +12,8 @@ document.addEventListener('DOMContentLoaded', function() {
     function openSidebar() {
         sidebar.classList.add('open');
         sidebar.classList.remove('closed');
-        toggle.classList.add('top-right'); // Add class to move button to top right
-        toggle.innerHTML = '&times;'; // Change icon to cross
+        toggle.classList.add('top-right');
+        toggle.innerHTML = '&times;';
         document.body.classList.add('sidebar-open');
         overlay.style.display = 'block';
     }
@@ -20,8 +21,8 @@ document.addEventListener('DOMContentLoaded', function() {
     function closeSidebar() {
         sidebar.classList.remove('open');
         sidebar.classList.add('closed');
-        toggle.classList.remove('top-right'); // Remove class to move button to bottom
-        toggle.innerHTML = '&#9776;'; // Change icon back to hamburger
+        toggle.classList.remove('top-right');
+        toggle.innerHTML = '&#9776;';
         document.body.classList.remove('sidebar-open');
         overlay.style.display = 'none';
     }

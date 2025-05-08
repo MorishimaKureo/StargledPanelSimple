@@ -3,43 +3,80 @@
 <head>
     <title>Minecraft Server Panel</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/css/global.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="/public/css/global.css">
+    <link rel="stylesheet" href="/public/css/home.css">
+    <link rel="stylesheet" href="/public/css/modals.css">
     <script src="/socket.io/socket.io.js"></script>
+    <!-- Removed inline <style> -->
 </head>
 <body>
     <%- include('partials/sidebar', { page: page }) %>
     <%- include('partials/header') %>
     <div id="main-content">
-        <h1>Minecraft Server Control Panel</h1>
-        <div id="console-section">
-            <button onclick="startServer()">Start Server</button>
-            <button onclick="stopServer()">Stop Server</button>
-            <button onclick="clearLog()">Clear Log</button>
-            <button id="kill-btn" style="background:#c00;color:#fff;margin-left:10px;">Kill</button>
-            <div class="console-container">
-                <div id="console-output"></div>
-            </div>
-            <input id="command-input" type="text" placeholder="Type command..." />
-            <button onclick="sendCommand()">Send</button>
-        </div>
-        <div id="system-stats">
-            <div class="chart-container">
-                <canvas id="cpu-usage-chart" width="200" height="100"></canvas>
-                <div id="cpu-usage"></div>
-            </div>
-            <div class="chart-container">
-                <canvas id="ram-usage-chart" width="200" height="100"></canvas>
-                <div id="ram-usage"></div>
-            </div>
-            <div class="chart-container">
-                <canvas id="server-folder-size-chart" width="200" height="100"></canvas>
-                <div id="server-folder-size"></div>
-            </div>
+        <h1>Multi-Server Minecraft Panel</h1>
+        <div id="server-list"></div>
+        
+        <!-- New Server Form -->
+        <h2>Create New Server</h2>
+        <form id="new-server-form">
+            <label for="server-id">Server ID:</label>
+            <input type="text" id="server-id" required>
+            <label for="server-name">Server Name:</label>
+            <input type="text" id="server-name" required>
+            <label for="startup-command">Startup Command:</label>
+            <input type="text" id="startup-command" required value="java -Xmx1G -jar server.jar nogui">
+            <button type="submit">Create Server</button>
+        </form>
+    </div>
+    <!-- Log Modal -->
+    <div id="log-modal">
+        <div id="log-modal-content">
+            <button id="close-log-btn">Close</button>
+            <h2 id="log-modal-title">Server Console</h2>
+            <div id="log-output"></div>
         </div>
     </div>
     <%- include('partials/footer') %>
-    <!-- Include your custom JavaScript file -->
-    <script src="/js/index.js"></script>
+    <script src="/public/js/index.js"></script>
+    <script>
+    document.getElementById('new-server-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const serverId = document.getElementById('server-id').value;
+        const serverName = document.getElementById('server-name').value;
+        const startupCommand = document.getElementById('startup-command').value;
+
+        fetch('/api/create-server', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: serverId, name: serverName, startup: startupCommand })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                alert('Server created successfully!');
+                renderServers(); // Refresh the server list
+            } else {
+                alert('Error: ' + data.message);
+            }
+        });
+    });
+
+    function deleteServer(id) {
+        if (confirm('Are you sure you want to delete this server?')) {
+            fetch(`/api/delete-server/${id}`, {
+                method: 'DELETE'
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Server deleted successfully!');
+                    renderServers(); // Refresh the server list
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            });
+        }
+    }
+    </script>
 </body>
 </html>

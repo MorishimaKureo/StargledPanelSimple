@@ -1,10 +1,10 @@
 document.getElementById('edit-form').addEventListener('submit', function(e) {
     e.preventDefault();
-    fetch('/save', {
+    fetch(`/edit/${serverId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            file: "<%= file.replace(/\"/g, '\\\"') %>",
+            filePath: filePath,
             content: document.getElementById('file-content').value
         })
     })

@@ -1,25 +1,31 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Edit <%= file %> - File Manager</title>
+    <title>Edit <%= filePath %> - File Manager</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="/public/css/global.css">
+    <!-- Removed inline <style> -->
 </head>
 <body>
-    <%- include('partials/sidebar', { page: page }) %>
+    <%- include('partials/sidebar', { page: 'filemanager' }) %>
     <%- include('partials/header') %>
     <div id="main-content">
-        <h1>Edit File: <%= file %></h1>
+        <h1>Edit File: <%= filePath %></h1>
         <form id="edit-form">
             <textarea id="file-content" name="content"><%= content %></textarea>
             <div class="actions">
                 <button type="submit">Save</button>
-                <a href="/filemanager" style="margin-left:10px;">Back to File Manager</a>
+                <a href="/filemanager/<%= serverId %>">Back to File Manager</a>
             </div>
         </form>
         <div id="status"></div>
     </div>
     <%- include('partials/footer') %>
-    <script src="/js/edit.js"></script>
+    <script>
+    // Pass serverId and filePath to JS
+    const serverId = "<%= serverId %>";
+    const filePath = "<%= filePath.replace(/\\/g, '\\\\').replace(/'/g, '\\\'') %>";
+    </script>
+    <script src="/public/js/edit.js"></script>
 </body>
 </html>
