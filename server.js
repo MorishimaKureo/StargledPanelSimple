@@ -29,21 +29,39 @@ const upload = multer({
     limits: { fileSize: 500 * 1024 * 1024 } // Set limit to 500MB
 });
 
+// ===== Logger Utility =====
+const LOG_DIR = path.join(__dirname, 'logs');
+if (!fs.existsSync(LOG_DIR)) {
+    fs.mkdirSync(LOG_DIR, { recursive: true });
+}
+function logEvent(message) {
+    const timestamp = new Date().toISOString();
+    const logMsg = `[${timestamp}] ${message}\n`;
+    // Tulis ke file log harian
+    const logFile = path.join(LOG_DIR, `${new Date().toISOString().slice(0,10)}.log`);
+    fs.appendFileSync(logFile, logMsg);
+    // Tampilkan juga di terminal
+    console.log(logMsg.trim());
+}
+
 // ========== ROUTES ==========
 
 // Home: List all servers
 app.get('/', (req, res) => {
+    logEvent('Home page accessed');
     res.render('index', { page: 'console' });
 });
 
 // API: List all servers
 app.get('/api/servers', (req, res) => {
+    logEvent('API: List all servers');
     res.json({ servers: serverManager.getAllServers() });
 });
 
 // API: Get server detail
 app.get('/api/server/:id', (req, res) => {
     const srv = serverManager.getServer(req.params.id);
+    logEvent(`API: Get server detail for ${req.params.id}`);
     if (!srv) return res.status(404).send('Not found');
     res.json(srv);
 });
@@ -51,7 +69,9 @@ app.get('/api/server/:id', (req, res) => {
 // API: Start server
 app.post('/api/server/:id/start', (req, res) => {
     const id = req.params.id;
+    logEvent(`API: Start server ${req.params.id}`);
     const ok = serverManager.startServer(id);
+    logEvent(`Server ${id} ${ok ? 'started' : 'failed to start'}`);
     if (!ok) return res.status(400).send('Already running or not found');
     res.json({ status: 'started' });
 });
@@ -59,7 +79,9 @@ app.post('/api/server/:id/start', (req, res) => {
 // API: Stop server
 app.post('/api/server/:id/stop', (req, res) => {
     const id = req.params.id;
+    logEvent(`API: Stop server ${req.params.id}`);
     const ok = serverManager.stopServer(id);
+    logEvent(`Server ${id} ${ok?'stopped' : 'failed to stop'}`);
     if (!ok) return res.status(400).send('Not running or not found');
     res.json({ status: 'stopped' });
 });
@@ -67,7 +89,9 @@ app.post('/api/server/:id/stop', (req, res) => {
 // API: Update server config (startup command, name, etc)
 app.post('/api/server/:id/config', (req, res) => {
     const id = req.params.id;
+    logEvent(`API: Update server config for ${req.params.id}`);
     const srv = serverManager.getServer(id);
+    logEvent(`Server ${id} ${srv?'found' : 'not found'}`);
     if (!srv) return res.status(404).send('Not found');
     serverManager.updateServer(id, req.body);
     res.json({ status: 'updated' });
@@ -76,7 +100,9 @@ app.post('/api/server/:id/config', (req, res) => {
 // File manager page per server
 app.get('/filemanager/:id', (req, res) => {
     const id = req.params.id;
+    logEvent(`File manager page accessed for ${req.params.id}`);
     const srv = serverManager.getServer(id);
+    logEvent(`File manager page accessed for ${req.params.id}`);
     if (!srv) return res.status(404).send('Not found');
     res.render('filemanager', { serverId: id, serverName: srv.name });
 });
@@ -84,7 +110,9 @@ app.get('/filemanager/:id', (req, res) => {
 // Settings page per server
 app.get('/settings/:serverId', (req, res) => {
     const serverId = req.params.serverId;
+    logEvent(`Settings page accessed for ${req.params.serverId}`);
     const server = serverManager.getServer(serverId);
+    logEvent(`Settings page accessed for ${req.params.serverId}`);
     if (!server) return res.status(404).send('Server not found');
     res.render('settings', {
         page: 'settings',
@@ -95,6 +123,7 @@ app.get('/settings/:serverId', (req, res) => {
 
 app.post('/settings/:serverId', (req, res) => {
     const serverId = req.params.serverId;
+    logEvent(`Settings page submitted for ${req.params.serverId}`);
     const { startupScript } = req.body;
     const server = serverManager.getServer(serverId);
     if (!server) return res.status(404).send('Server not found');
@@ -107,6 +136,7 @@ app.post('/settings/:serverId', (req, res) => {
 // List files/folders for a specific server
 app.get('/files/:id', (req, res) => {
     const id = req.params.id;
+    logEvent(`API: List files/folders for ${req.params.id}`);
     const srv = serverManager.getServer(id);
     if (!srv) return res.status(404).send('Not found');
     const relPath = req.query.path || '';
@@ -129,6 +159,7 @@ app.get('/files/:id', (req, res) => {
 // Download file
 app.get('/download/:id', (req, res) => {
     const id = req.params.id;
+    logEvent(`API: Download file for ${req.params.id}`);
     const srv = serverManager.getServer(id);
     if (!srv) return res.status(404).send('Not found');
     const relPath = req.query.file;
@@ -143,6 +174,7 @@ app.get('/download/:id', (req, res) => {
 // Create file
 app.post('/create-file/:id', (req, res) => {
     const id = req.params.id;
+    logEvent(`API: Create file for ${req.params.id}`);
     const srv = serverManager.getServer(id);
     if (!srv) return res.status(404).send('Not found');
     const fileName = req.body.fileName;
@@ -160,6 +192,7 @@ app.post('/create-file/:id', (req, res) => {
 // Create folder
 app.post('/create-folder/:id', (req, res) => {
     const id = req.params.id;
+    logEvent(`API: Create folder for ${req.params.id}`);
     const srv = serverManager.getServer(id);
     if (!srv) return res.status(404).send('Not found');
     const folderName = req.body.folderName;
@@ -177,6 +210,7 @@ app.post('/create-folder/:id', (req, res) => {
 // Delete file/folder
 app.delete('/delete/:id', (req, res) => {
     const id = req.params.id;
+    logEvent(`API: Delete file/folder for ${req.params.id}`);
     const srv = serverManager.getServer(id);
     if (!srv) return res.status(404).send('Not found');
     const relPath = req.query.file;
@@ -204,6 +238,7 @@ app.delete('/delete/:id', (req, res) => {
 // Rename file/folder
 app.post('/rename/:id', (req, res) => {
     const id = req.params.id;
+    logEvent(`API: Rename file/folder for ${req.params.id}`);
     const srv = serverManager.getServer(id);
     if (!srv) return res.status(404).send('Not found');
     const { oldName, newName } = req.body;
@@ -223,6 +258,7 @@ app.post('/rename/:id', (req, res) => {
 // Upload file
 app.post('/upload/:id', upload.single('file'), (req, res) => {
     const id = req.params.id;
+    logEvent(`API: Upload file for ${req.params.id}`);
     const srv = serverManager.getServer(id);
     if (!srv) return res.status(404).send('Not found');
     if (!req.file) return res.status(400).send('No file uploaded');
@@ -238,11 +274,12 @@ app.post('/upload/:id', upload.single('file'), (req, res) => {
     });
 });
 
-// ========== EDIT FILE (OPTIONAL) ==========
+// ========== EDIT FILE ==========
 
 // Edit file page (simple text editor)
 app.get('/edit/:id', (req, res) => {
     const id = req.params.id;
+    logEvent(`Edit file page accessed for ${req.params.id}`);
     const srv = serverManager.getServer(id);
     if (!srv) return res.status(404).send('Not found');
     const relPath = req.query.file;
@@ -260,6 +297,7 @@ app.get('/edit/:id', (req, res) => {
 // Save edited file
 app.post('/edit/:id', (req, res) => {
     const id = req.params.id;
+    logEvent(`API: Save edited file for ${req.params.id}`);
     const srv = serverManager.getServer(id);
     if (!srv) return res.status(404).send('Not found');
     const { filePath, content } = req.body;
@@ -278,81 +316,58 @@ app.post('/edit/:id', (req, res) => {
 
 const logWatchers = {}; // { [serverId]: { watcher, lastSize, clients: Set<socket> } }
 
-function getLatestLogPath(serverId) {
-    return path.join(serverManager.SERVERS_DIR, serverId, 'logs', 'latest.log');
-}
-
 function sendInitialLog(socket, serverId) {
-    const logPath = getLatestLogPath(serverId);
-    fs.readFile(logPath, 'utf8', (err, data) => {
-        if (!err && data) {
-            // Send only last 200 lines for performance
-            const lines = data.split('\n');
-            const lastLines = lines.slice(-200).join('\n');
-            socket.emit('server-log', { serverId, log: lastLines });
-        }
-    });
+    // Tidak ada initial log dari proses, bisa kirim pesan info
+    socket.emit('server-log', { serverId, log: '[INFO] Log akan muncul di sini jika server sedang berjalan.\n' });
 }
 
-function watchLogFile(serverId) {
+function watchProcessLog(serverId) {
     if (logWatchers[serverId]) return;
-    const logPath = getLatestLogPath(serverId);
-    let lastSize = 0;
     let clients = new Set();
 
-    // Watch file for changes
-    function onChange(curr, prev) {
-        if (curr.size > lastSize) {
-            const stream = fs.createReadStream(logPath, {
-                start: lastSize,
-                end: curr.size
-            });
-            let chunk = '';
-            stream.on('data', data => { chunk += data.toString(); });
-            stream.on('end', () => {
-                for (const sock of clients) {
-                    sock.emit('server-log', { serverId, log: chunk });
-                }
-            });
-            lastSize = curr.size;
-        } else if (curr.size < lastSize) {
-            // File truncated (rotated), send whole file
-            lastSize = 0;
-            sendInitialLogToAll();
-        }
-    }
-
-    function sendInitialLogToAll() {
-        fs.readFile(logPath, 'utf8', (err, data) => {
-            if (!err && data) {
-                const lines = data.split('\n');
-                const lastLines = lines.slice(-200).join('\n');
-                for (const sock of clients) {
-                    sock.emit('server-log', { serverId, log: lastLines });
-                }
+    function attachListeners(proc) {
+        const onStdout = data => {
+            for (const sock of clients) {
+                sock.emit('server-log', { serverId, log: data.toString() });
             }
-        });
+        };
+        const onStderr = data => {
+            for (const sock of clients) {
+                sock.emit('server-log', { serverId, log: data.toString() });
+            }
+        };
+        const onExit = code => {
+            for (const sock of clients) {
+                sock.emit('server-log', { serverId, log: `[INFO] Server process exited with code ${code}\n` });
+            }
+        };
+        proc.stdout.on('data', onStdout);
+        proc.stderr.on('data', onStderr);
+        proc.on('exit', onExit);
+
+        return { onStdout, onStderr, onExit };
     }
 
-    // Start watching
-    try {
-        if (fs.existsSync(logPath)) {
-            lastSize = fs.statSync(logPath).size;
-        }
-        fs.watchFile(logPath, { interval: 1000 }, onChange);
-    } catch (e) {
-        // ignore
+    let listeners = null;
+    const proc = serverManager.processes[serverId];
+    if (proc) {
+        listeners = attachListeners(proc);
     }
 
     logWatchers[serverId] = {
         clients,
+        listeners,
         close: () => {
-            fs.unwatchFile(logPath, onChange);
+            if (proc && listeners) {
+                proc.stdout.off('data', listeners.onStdout);
+                proc.stderr.off('data', listeners.onStderr);
+                proc.off('exit', listeners.onExit);
+            }
         }
     };
 }
 
-function unwatchLogFile(serverId) {
+function unwatchProcessLog(serverId) {
     if (logWatchers[serverId]) {
         logWatchers[serverId].close();
         delete logWatchers[serverId];
@@ -373,7 +388,7 @@ io.on('connection', (socket) => {
                 // Implementasi detail tergantung pada arsitektur kamu
             });
             if (!serverManager.getServer(serverId)) return;
-            watchLogFile(serverId);
+            watchProcessLog(serverId);
             logWatchers[serverId].clients.add(socket);
             sendInitialLog(socket, serverId);
         });
@@ -382,7 +397,7 @@ io.on('connection', (socket) => {
             if (logWatchers[serverId]) {
                 logWatchers[serverId].clients.delete(socket);
                 if (logWatchers[serverId].clients.size === 0) {
-                    unwatchLogFile(serverId);
+                    unwatchProcessLog(serverId);
                 }
             }
         });

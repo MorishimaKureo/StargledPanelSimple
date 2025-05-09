@@ -5,7 +5,7 @@
       "name": "lobby",
       "path": "./servers/lobby",
       "startup": "java -Xmx2G -jar server.jar nogui",
-      "status": "stopped"
+      "status": "running"
     }
   ]
 }
