@@ -56,8 +56,13 @@ function startServer(id, onOutput, onExit) {
     servers[id].status = 'running';
     saveServers();
 
-    proc.stdout.on('data', data => onOutput && onOutput(data.toString()));
-    proc.stderr.on('data', data => onOutput && onOutput(data.toString()));
+    // Jika onOutput tidak diberikan, tetap handle agar tidak error
+    proc.stdout.on('data', data => {
+        if (onOutput) onOutput(data.toString());
+    });
+    proc.stderr.on('data', data => {
+        if (onOutput) onOutput(data.toString());
+    });
     proc.on('exit', code => {
         servers[id].status = 'stopped';
         saveServers();
@@ -144,5 +149,6 @@ module.exports = {
     sendCommand,
     createNewServer,
     deleteServer, // Export the new function
-    SERVERS_DIR: SERVERS_ROOT
+    SERVERS_DIR: SERVERS_ROOT,
+    processes // <-- tambahkan ini jika ingin akses proses dari luar
 };

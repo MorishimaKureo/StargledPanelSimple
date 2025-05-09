@@ -150,4 +150,21 @@ servers/bungee/plugins
 servers/bungee/forwarding.secret
 servers/bungee/velocity.toml
 
+servers/lobby/world
+servers/lobby/world_nether
+servers/lobby/world_the_end
+servers/lobby/banned-ips.json
+servers/lobby/banned-players.json
+servers/lobby/bukkit.yml
+servers/lobby/commands.yml
+servers/lobby/help.yml
+servers/lobby/ops.json
+servers/lobby/permissions.yml
+servers/lobby/purpur.yml
+servers/lobby/spigot.yml
+servers/lobby/usercache.json
+servers/lobby/version_history.json
+servers/lobby/whitelist.json
+servers/lobby/config
+
 StargledPanelSimple.zip

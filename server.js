@@ -362,75 +362,86 @@ function unwatchLogFile(serverId) {
 // Socket.IO for real-time log per server
 io.on('connection', (socket) => {
     socket.on('subscribe-log', (serverId) => {
-        if (!serverManager.getServer(serverId)) return;
-        watchLogFile(serverId);
-        logWatchers[serverId].clients.add(socket);
-        sendInitialLog(socket, serverId);
+        // Tambahkan pada bagian Socket.IO
+        io.on('connection', (socket) => {
+            socket.on('subscribe-log', (serverId) => {
+                // Simpan socket ke dalam map jika perlu
+                // Pastikan saat server dijalankan, output dikirim ke socket ini
+                // Misal:
+                if (!serverManager.getStatus(serverId) === 'running') return;
+                // Kirim log dari proses yang sedang berjalan
+                // Implementasi detail tergantung pada arsitektur kamu
+            });
+            if (!serverManager.getServer(serverId)) return;
+            watchLogFile(serverId);
+            logWatchers[serverId].clients.add(socket);
+            sendInitialLog(socket, serverId);
+        });
+
+        socket.on('unsubscribe-log', (serverId) => {
+            if (logWatchers[serverId]) {
+                logWatchers[serverId].clients.delete(socket);
+                if (logWatchers[serverId].clients.size === 0) {
+                    unwatchLogFile(serverId);
+                }
+            }
+        });
+
+        socket.on('disconnect', () => {
+            for (const [serverId, watcher] of Object.entries(logWatchers)) {
+                watcher.clients.delete(socket);
+                if (watcher.clients.size === 0) {
+                    unwatchLogFile(serverId);
+                }
+            }
+        });
     });
 
-    socket.on('unsubscribe-log', (serverId) => {
-        if (logWatchers[serverId]) {
-            logWatchers[serverId].clients.delete(socket);
-            if (logWatchers[serverId].clients.size === 0) {
-                unwatchLogFile(serverId);
-            }
+    // Console page per server
+    app.get('/console/:id', (req, res) => {
+        const serverId = req.params.id;
+        const server = serverManager.getServer(serverId);
+        if (!server) return res.status(404).send('Server not found');
+        res.render('console', { 
+            serverId: serverId,
+            serverName: server.name,
+            serverStatus: server.status
+        });
+    });
+
+    // API to send command to server process
+    app.post('/api/server/:id/command', express.json(), (req, res) => {
+        const id = req.params.id;
+        const command = req.body.command;
+        if (!command) return res.status(400).send('No command');
+        const ok = serverManager.sendCommand(id, command);
+        if (!ok) return res.status(400).send('Server not running');
+        res.json({ status: 'sent' });
+    });
+
+    app.post('/api/create-server', (req, res) => {
+        const { id, name, startup } = req.body;
+        try {
+            serverManager.createNewServer(id, name, startup);
+            res.json({ success: true });
+        } catch (error) {
+            res.json({ success: false, message: error.message });
         }
     });
 
-    socket.on('disconnect', () => {
-        for (const [serverId, watcher] of Object.entries(logWatchers)) {
-            watcher.clients.delete(socket);
-            if (watcher.clients.size === 0) {
-                unwatchLogFile(serverId);
-            }
+    app.delete('/api/delete-server/:id', (req, res) => {
+        const serverId = req.params.id;
+        try {
+            serverManager.deleteServer(serverId);
+            res.json({ success: true });
+        } catch (error) {
+            res.json({ success: false, message: error.message });
         }
     });
 });
 
-// Console page per server
-app.get('/console/:id', (req, res) => {
-    const serverId = req.params.id;
-    const server = serverManager.getServer(serverId);
-    if (!server) return res.status(404).send('Server not found');
-    res.render('console', { 
-        serverId: serverId,
-        serverName: server.name,
-        serverStatus: server.status
+    // ========== START SERVER ==========
+
+    server.listen(PORT, () => {
+        console.log(`StargledPanelSimple multi-server running at http://localhost:${PORT}`);
     });
-});
-
-// API to send command to server process
-app.post('/api/server/:id/command', express.json(), (req, res) => {
-    const id = req.params.id;
-    const command = req.body.command;
-    if (!command) return res.status(400).send('No command');
-    const ok = serverManager.sendCommand(id, command);
-    if (!ok) return res.status(400).send('Server not running');
-    res.json({ status: 'sent' });
-});
-
-app.post('/api/create-server', (req, res) => {
-    const { id, name, startup } = req.body;
-    try {
-        serverManager.createNewServer(id, name, startup);
-        res.json({ success: true });
-    } catch (error) {
-        res.json({ success: false, message: error.message });
-    }
-});
-
-app.delete('/api/delete-server/:id', (req, res) => {
-    const serverId = req.params.id;
-    try {
-        serverManager.deleteServer(serverId);
-        res.json({ success: true });
-    } catch (error) {
-        res.json({ success: false, message: error.message });
-    }
-});
-
-// ========== START SERVER ==========
-
-server.listen(PORT, () => {
-    console.log(`StargledPanelSimple multi-server running at http://localhost:${PORT}`);
-});
