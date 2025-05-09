@@ -2,7 +2,7 @@
 <html>
 <head>
     <!-- Line 4 fix -->
-    <title>Console - <%= server.name %></title>
+    <title>Console - <%= serverName %></title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="/public/css/global.css">
     <link rel="stylesheet" href="/public/css/console.css">
@@ -10,15 +10,15 @@
     <!-- Removed inline <style> -->
 </head>
 <body>
-    <%- include('partials/sidebar', { page: 'console', 'server.id': 'server.id' }) %>
+    <%- include('partials/sidebar', { page: 'console' }) %>
     <%- include('partials/header') %>
     <div id="main-content">
-        <h1>Console: <%= 'server.id' %></h1>
         <div class="console-header">
-            <h2>Console - <%= 'server.id' %></h2>
+            <h2>Console - <%= serverId %></h2>
+            <h3>Status - <%= serverStatus%> </h3>
             <div class="server-actions">
-                <button id="startButton" <%= server.status === 'running' ? 'disabled' : '' %>>Start</button>
-                <button id="stopButton" <%= server.status !== 'running' ? 'disabled' : '' %>>Stop</button>
+                <button id="startButton" <%= serverStatus === 'running' ? 'disabled' : '' %>>Start</button>
+                <button id="stopButton" <%= serverStatus !== 'running' ? 'disabled' : '' %>>Stop</button>
             </div>
         </div>
         <div id="console-log"></div>
@@ -29,7 +29,7 @@
     </div>
     <%- include('partials/footer') %>
     <script>
-    const server.id = "<%= 'server.id' %>";
+    const serverId = "<%= serverId %>";
     </script>
     <script src="/public/js/console.js"></script>
 </body>

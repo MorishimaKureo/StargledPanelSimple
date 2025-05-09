@@ -389,13 +389,13 @@ io.on('connection', (socket) => {
 
 // Console page per server
 app.get('/console/:id', (req, res) => {
-    const server = serverManager.getAllServers().find(s => s.id === req.params.id);
+    const serverId = req.params.id;
+    const server = serverManager.getServer(serverId);
+    if (!server) return res.status(404).send('Server not found');
     res.render('console', { 
-        server: {
-            id: server.id,
-            name: server.name,  // Add this line
-            status: server.status
-        }
+        serverId: serverId,
+        serverName: server.name,
+        serverStatus: server.status
     });
 });
 
